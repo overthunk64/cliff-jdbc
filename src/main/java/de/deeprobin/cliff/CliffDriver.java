@@ -1,57 +1,84 @@
-package de.deeprobin.cliff;
-
 import java.sql.*;
 import java.util.Properties;
 import java.util.logging.Logger;
 
 public class CliffDriver implements Driver {
+    
+    static {
+        try {
+            DriverManager.registerDriver(new CliffDriver());
+        } catch (SQLException e) {
+            throw new RuntimeException("Fehler beim Registrieren des Treibers", e);
+        }
+    }
+    
     @Override
     public Connection connect(String url, Properties info) throws SQLException {
         if (url == null) {
-            throw new SQLException("url is null");
+            throw new SQLException("Die URL ist null");
         }
 
-        if (!url.startsWith("jdbc:cliff:")) {
+        if (!acceptsURL(url)) {
             return null;
         }
 
-        // TODO
-        throw new RuntimeException("Not implemented");
+        String databaseName = url.substring("jdbc:cliff:".length());
+        
+        // Hier passiert der eigentliche Verbindungsaufbau zur Datenbank
+        // In diesem Beispiel wird die Verbindung nur simuliert
+        return new CliffConnection(databaseName);
     }
 
     @Override
     public boolean acceptsURL(String url) throws SQLException {
-        // TODO
-        return false;
+        if (url == null) {
+            throw new SQLException("Die URL ist null");
+        }
+        return url.startsWith("jdbc:cliff:");
     }
 
     @Override
     public DriverPropertyInfo[] getPropertyInfo(String url, Properties info) throws SQLException {
-        // TODO
+        // Wenn keine Verbindungseigenschaften unterstützt werden, kann ein leeres Array zurückgegeben werden
         return new DriverPropertyInfo[0];
     }
 
-    // TODO
     @Override
     public int getMajorVersion() {
-        return 0;
+        return 1;
     }
 
-    // TODO
     @Override
     public int getMinorVersion() {
         return 0;
     }
 
-    // TODO
     @Override
     public boolean jdbcCompliant() {
-        return false;
+        return true;
     }
 
-    // TODO
     @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-        return null;
+        // Wenn java.util.logging nicht verwendet wird, kann eine SQLFeatureNotSupportedException geworfen werden
+        throw new SQLFeatureNotSupportedException("java.util.logging wird nicht unterstützt");
     }
+}
+
+class CliffConnection implements Connection {
+    
+    private String databaseName;
+    
+    CliffConnection(String databaseName) {
+        this.databaseName = databaseName;
+    }
+    
+    // Implementierung der anderen Methoden des Connection Interfaces
+    
+    @Override
+    public void close() throws SQLException {
+        // Verbindung schließen
+    }
+    
+    // ...
 }
